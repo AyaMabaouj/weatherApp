@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -45,6 +47,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    SharedPreferences sharedpreferences;
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
 
     private RelativeLayout homeRl;
     private ProgressBar loadingPB;
@@ -61,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         setContentView(R.layout.activity_main);
@@ -94,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         cityName = getCityName(location.getLongitude(), location.getLatitude());
         getWeatherInfo(cityName);
 
+        String finalCityName = cityName;
         searchIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 if (city.isEmpty()){
                     Toast.makeText(MainActivity.this,"Please Enter City Name",Toast.LENGTH_SHORT).show();
                 }else{
-                    cityNameTV.setText(cityName);
+                    cityNameTV.setText(finalCityName);
                     getWeatherInfo(city);
                 }
             }
@@ -146,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     private void getWeatherInfo(String cityName){
         String url = "http://api.weatherapi.com/v1/forecast.json?key=8384ce731c8c416892e111040231802&q=" + cityName + "&days=1&aqi=yes&alerts=yes";
         if(cityName.equals("Radès")){
-            url = "";
+            url = "http://api.weatherapi.com/v1/forecast.json?key=8384ce731c8c416892e111040231802&q=radis&days=1&aqi=yes&alerts=yes";
 
         }
         cityNameTV.setText(cityName);
@@ -187,6 +194,22 @@ public class MainActivity extends AppCompatActivity {
                         weatherRVModalArrayList.add(new weatherRvModel(time,temper,img,wind));
                     }
                     weatherRVAdapter.notifyDataSetChanged();
+                    SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref",MODE_PRIVATE);
+
+                    // Creating an Editor object to edit(write to the file)
+                    SharedPreferences.Editor myEdit = sharedPreferences.edit();
+
+                    // Storing the key and its value as the data fetched from edittext
+                    myEdit.putString("cityName", cityName);
+                    myEdit.putString("temperature", temperature);
+
+                    // Once the changes have been made, we need to commit to apply those changes made,
+                    // otherwise, it will throw an error
+                    myEdit.apply();
+                    Context context = getApplicationContext();
+                    Intent intent = new Intent(context, WeatherWidgetReceiver.class);
+                    intent.setAction("com.example.weatherapp.action.UPDATE_WIDGET");
+                    context.sendBroadcast(intent);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -202,4 +225,5 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
 
     }
+
 }

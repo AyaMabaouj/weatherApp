@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
+    <permission android:name="com.example.weatherapp.permission.RECEIVE_WEATHER_DATA"
+        android:label="Permission to receive weather data" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,7 +23,6 @@
         tools:targetApi="31" >
         <service
             android:name=".LocationService"
-            android:enabled="true"
             android:exported="true" >
         </service>
 

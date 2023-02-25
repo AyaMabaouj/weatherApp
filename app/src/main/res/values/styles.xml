@@ -7,6 +7,6 @@
 
     <style name="Widget.WeatherAppmain.AppWidget.InnerView" parent="android:Widget">
         <item name="android:background">?android:attr/colorBackground</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textColor">#00000000</item>
     </style>
 </resources>
